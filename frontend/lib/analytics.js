@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { JWT } from "google-auth-library";
 
-export async function getAnalyticsData() {
+export async function getAnalyticsData(siteId = null, periodId = "month") {
    const keyFilePath = path.join(
       process.cwd(),
       "credentials",
@@ -19,16 +19,13 @@ export async function getAnalyticsData() {
 
    await jwt.authorize();
 
-   const propertyId = process.env.GA_PROPERTY_ID;
-   if (!propertyId) throw new Error("GA_PROPERTY_ID n'est pas défini");
+   const propertyId = siteId || process.env.GA_PROPERTY_ID;
+   if (!propertyId) throw new Error("Aucun Property ID fourni");
 
    const url = `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`;
 
-   // Obtenir le premier jour du mois en cours
-   const now = new Date();
-   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-   const startDate = firstDayOfMonth.toISOString().split("T")[0]; // Format YYYY-MM-DD
-   const endDate = now.toISOString().split("T")[0];
+   // Calculer les dates selon la période choisie
+   const { startDate, endDate } = calculateDateRange(periodId);
 
    const body = {
       dateRanges: [
@@ -67,7 +64,7 @@ export async function getAnalyticsData() {
 
    const data = await res.json();
 
-   // Calculer les totaux pour le mois
+   // Calculer les totaux pour la période
    const totals = {
       totalUsers: 0,
       totalSessions: 0,
@@ -102,9 +99,70 @@ export async function getAnalyticsData() {
          startDate,
          endDate,
          daysCount: data.rows ? data.rows.length : 0,
+         periodId: periodId,
       },
       totals,
       dailyData: data.rows || [],
       headers: data.metricHeaders || [],
+      propertyId: propertyId,
    };
+}
+
+// Fonction pour calculer les dates selon la période
+function calculateDateRange(periodId) {
+   const now = new Date();
+   const today = now.toISOString().split("T")[0]; // Format YYYY-MM-DD
+
+   let startDate;
+
+   switch (periodId) {
+      case "7days":
+         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+         startDate = sevenDaysAgo.toISOString().split("T")[0];
+         break;
+
+      case "30days":
+         const thirtyDaysAgo = new Date(
+            now.getTime() - 30 * 24 * 60 * 60 * 1000
+         );
+         startDate = thirtyDaysAgo.toISOString().split("T")[0];
+         break;
+
+      case "90days":
+         const ninetyDaysAgo = new Date(
+            now.getTime() - 90 * 24 * 60 * 60 * 1000
+         );
+         startDate = ninetyDaysAgo.toISOString().split("T")[0];
+         break;
+
+      case "month":
+         // Premier jour du mois en cours
+         startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+            .toISOString()
+            .split("T")[0];
+         break;
+
+      case "quarter":
+         // Premier jour du trimestre en cours
+         const quarter = Math.floor(now.getMonth() / 3);
+         startDate = new Date(now.getFullYear(), quarter * 3, 1)
+            .toISOString()
+            .split("T")[0];
+         break;
+
+      case "year":
+         // Premier jour de l'année en cours
+         startDate = new Date(now.getFullYear(), 0, 1)
+            .toISOString()
+            .split("T")[0];
+         break;
+
+      default:
+         // Par défaut : mois en cours
+         startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+            .toISOString()
+            .split("T")[0];
+   }
+
+   return { startDate, endDate: today };
 }

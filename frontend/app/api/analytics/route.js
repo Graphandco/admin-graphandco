@@ -1,15 +1,23 @@
 import { getAnalyticsData } from "@/lib/analytics";
 
-export async function GET() {
+export async function GET(request) {
    try {
       console.log("Début de la requête API analytics");
 
-      const data = await getAnalyticsData();
+      // Récupérer les paramètres depuis l'URL
+      const { searchParams } = new URL(request.url);
+      const siteId = searchParams.get("site");
+      const periodId = searchParams.get("period");
+
+      console.log("Site demandé:", siteId || "défaut");
+      console.log("Période demandée:", periodId || "défaut");
+
+      const data = await getAnalyticsData(siteId, periodId);
 
       console.log("Données récupérées avec succès:", {
-         rowCount: data.rows?.length || 0,
-         metricHeaders: data.metricHeaders?.length || 0,
-         dimensionHeaders: data.dimensionHeaders?.length || 0,
+         rowCount: data.dailyData?.length || 0,
+         siteId: siteId,
+         periodId: periodId,
       });
 
       return Response.json(data);
