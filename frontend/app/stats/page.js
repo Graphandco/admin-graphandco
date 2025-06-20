@@ -1,6 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+   Select,
+   SelectContent,
+   SelectItem,
+   SelectTrigger,
+   SelectValue,
+} from "@/components/ui/select";
 
 // Configuration des sites
 const SITES = [
@@ -136,48 +143,44 @@ export default function StatsPage() {
 
             {/* Sélecteurs */}
             <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-               <div>
-                  <label
-                     htmlFor="site-select"
-                     className="block text-sm font-medium mb-2"
-                  >
-                     Site :
-                  </label>
-                  <select
-                     id="site-select"
+               <div className="space-y-2">
+                  <label className="text-sm font-medium">Site</label>
+                  <Select
                      value={selectedSite.id}
-                     onChange={(e) => handleSiteChange(e.target.value)}
-                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     onValueChange={handleSiteChange}
                      disabled={loading}
                   >
-                     {SITES.map((site) => (
-                        <option key={site.id} value={site.id}>
-                           {site.name} ({site.id})
-                        </option>
-                     ))}
-                  </select>
+                     <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un site" />
+                     </SelectTrigger>
+                     <SelectContent>
+                        {SITES.map((site) => (
+                           <SelectItem key={site.id} value={site.id}>
+                              {site.name} ({site.id})
+                           </SelectItem>
+                        ))}
+                     </SelectContent>
+                  </Select>
                </div>
 
-               <div>
-                  <label
-                     htmlFor="period-select"
-                     className="block text-sm font-medium mb-2"
-                  >
-                     Période :
-                  </label>
-                  <select
-                     id="period-select"
+               <div className="space-y-2">
+                  <label className="text-sm font-medium">Période</label>
+                  <Select
                      value={selectedPeriod.id}
-                     onChange={(e) => handlePeriodChange(e.target.value)}
-                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     onValueChange={handlePeriodChange}
                      disabled={loading}
                   >
-                     {PERIODS.map((period) => (
-                        <option key={period.id} value={period.id}>
-                           {period.name}
-                        </option>
-                     ))}
-                  </select>
+                     <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner une période" />
+                     </SelectTrigger>
+                     <SelectContent>
+                        {PERIODS.map((period) => (
+                           <SelectItem key={period.id} value={period.id}>
+                              {period.name}
+                           </SelectItem>
+                        ))}
+                     </SelectContent>
+                  </Select>
                </div>
             </div>
 
@@ -199,46 +202,42 @@ export default function StatsPage() {
 
             {/* Sélecteurs */}
             <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-               <div>
-                  <label
-                     htmlFor="site-select"
-                     className="block text-sm font-medium mb-2"
-                  >
-                     Site :
-                  </label>
-                  <select
-                     id="site-select"
+               <div className="space-y-2">
+                  <label className="text-sm font-medium">Site</label>
+                  <Select
                      value={selectedSite.id}
-                     onChange={(e) => handleSiteChange(e.target.value)}
-                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     onValueChange={handleSiteChange}
                   >
-                     {SITES.map((site) => (
-                        <option key={site.id} value={site.id}>
-                           {site.name} ({site.id})
-                        </option>
-                     ))}
-                  </select>
+                     <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un site" />
+                     </SelectTrigger>
+                     <SelectContent>
+                        {SITES.map((site) => (
+                           <SelectItem key={site.id} value={site.id}>
+                              {site.name} ({site.id})
+                           </SelectItem>
+                        ))}
+                     </SelectContent>
+                  </Select>
                </div>
 
-               <div>
-                  <label
-                     htmlFor="period-select"
-                     className="block text-sm font-medium mb-2"
-                  >
-                     Période :
-                  </label>
-                  <select
-                     id="period-select"
+               <div className="space-y-2">
+                  <label className="text-sm font-medium">Période</label>
+                  <Select
                      value={selectedPeriod.id}
-                     onChange={(e) => handlePeriodChange(e.target.value)}
-                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     onValueChange={handlePeriodChange}
                   >
-                     {PERIODS.map((period) => (
-                        <option key={period.id} value={period.id}>
-                           {period.name}
-                        </option>
-                     ))}
-                  </select>
+                     <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner une période" />
+                     </SelectTrigger>
+                     <SelectContent>
+                        {PERIODS.map((period) => (
+                           <SelectItem key={period.id} value={period.id}>
+                              {period.name}
+                           </SelectItem>
+                        ))}
+                     </SelectContent>
+                  </Select>
                </div>
             </div>
 
@@ -262,46 +261,39 @@ export default function StatsPage() {
 
          {/* Sélecteurs */}
          <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-               <label
-                  htmlFor="site-select"
-                  className="block text-sm font-medium mb-2"
-               >
-                  Site :
-               </label>
-               <select
-                  id="site-select"
-                  value={selectedSite.id}
-                  onChange={(e) => handleSiteChange(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-               >
-                  {SITES.map((site) => (
-                     <option key={site.id} value={site.id}>
-                        {site.name} ({site.id})
-                     </option>
-                  ))}
-               </select>
+            <div className="space-y-2">
+               <label className="text-sm font-medium">Site</label>
+               <Select value={selectedSite.id} onValueChange={handleSiteChange}>
+                  <SelectTrigger>
+                     <SelectValue placeholder="Sélectionner un site" />
+                  </SelectTrigger>
+                  <SelectContent>
+                     {SITES.map((site) => (
+                        <SelectItem key={site.id} value={site.id}>
+                           {site.name} ({site.id})
+                        </SelectItem>
+                     ))}
+                  </SelectContent>
+               </Select>
             </div>
 
-            <div>
-               <label
-                  htmlFor="period-select"
-                  className="block text-sm font-medium mb-2"
-               >
-                  Période :
-               </label>
-               <select
-                  id="period-select"
+            <div className="space-y-2">
+               <label className="text-sm font-medium">Période</label>
+               <Select
                   value={selectedPeriod.id}
-                  onChange={(e) => handlePeriodChange(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onValueChange={handlePeriodChange}
                >
-                  {PERIODS.map((period) => (
-                     <option key={period.id} value={period.id}>
-                        {period.name}
-                     </option>
-                  ))}
-               </select>
+                  <SelectTrigger>
+                     <SelectValue placeholder="Sélectionner une période" />
+                  </SelectTrigger>
+                  <SelectContent>
+                     {PERIODS.map((period) => (
+                        <SelectItem key={period.id} value={period.id}>
+                           {period.name}
+                        </SelectItem>
+                     ))}
+                  </SelectContent>
+               </Select>
             </div>
          </div>
 
