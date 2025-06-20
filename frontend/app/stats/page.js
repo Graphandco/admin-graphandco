@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Configuration des sites
 const SITES = [
@@ -84,6 +85,48 @@ export default function StatsPage() {
 
    const formatPercentage = (value) => {
       return `${(value * 100).toFixed(1)}%`;
+   };
+
+   // Configuration des métriques pour les cartes
+   const getMetricsCards = (totals) => {
+      if (!totals) return [];
+
+      return [
+         {
+            title: "Visiteurs uniques",
+            value: totals.totalUsers?.toLocaleString() || "0",
+            description: "Nombre total d'utilisateurs uniques",
+         },
+         {
+            title: "Sessions",
+            value: totals.totalSessions?.toLocaleString() || "0",
+            description: "Nombre total de sessions",
+         },
+         {
+            title: "Pages vues",
+            value: totals.totalPageViews?.toLocaleString() || "0",
+            description: "Nombre total de pages consultées",
+         },
+         {
+            title: "Durée moyenne session",
+            value: totals.averageSessionDuration
+               ? formatDuration(totals.averageSessionDuration)
+               : "0m 0s",
+            description: "Temps moyen passé par session",
+         },
+         {
+            title: "Taux de rebond",
+            value: totals.averageBounceRate
+               ? formatPercentage(totals.averageBounceRate)
+               : "0%",
+            description: "Pourcentage de sessions à une seule page",
+         },
+         {
+            title: "Sessions/utilisateur",
+            value: totals.averageSessionsPerUser?.toFixed(2) || "0",
+            description: "Nombre moyen de sessions par utilisateur",
+         },
+      ];
    };
 
    if (loading) {
@@ -265,148 +308,138 @@ export default function StatsPage() {
          {data ? (
             <div className="space-y-6">
                {/* Période */}
-               <div className=" p-4 rounded-lg">
-                  <h3 className="font-semibold text-blue-800 mb-2">
-                     Période analysée
-                  </h3>
-                  <p className="text-blue-600">
-                     Du {data.period?.startDate} au {data.period?.endDate}(
-                     {data.period?.daysCount} jours)
-                  </p>
-               </div>
+               <Card>
+                  <CardHeader>
+                     <CardTitle>Période analysée</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                     <p className="text-muted-foreground">
+                        Du {data.period?.startDate} au {data.period?.endDate}(
+                        {data.period?.daysCount} jours)
+                     </p>
+                  </CardContent>
+               </Card>
 
-               {/* Totaux du mois */}
+               {/* Totaux avec Cards */}
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="bg-green-50 p-4 rounded-lg">
-                     <h3 className="font-semibold text-green-800">
-                        Visiteurs uniques
-                     </h3>
-                     <p className="text-3xl font-bold text-green-600">
-                        {data.totals?.totalUsers?.toLocaleString() || 0}
-                     </p>
-                  </div>
-
-                  <div className="bg-purple-50 p-4 rounded-lg">
-                     <h3 className="font-semibold text-purple-800">Sessions</h3>
-                     <p className="text-3xl font-bold text-purple-600">
-                        {data.totals?.totalSessions?.toLocaleString() || 0}
-                     </p>
-                  </div>
-
-                  <div className="bg-orange-50 p-4 rounded-lg">
-                     <h3 className="font-semibold text-orange-800">
-                        Pages vues
-                     </h3>
-                     <p className="text-3xl font-bold text-orange-600">
-                        {data.totals?.totalPageViews?.toLocaleString() || 0}
-                     </p>
-                  </div>
-
-                  <div className="bg-indigo-50 p-4 rounded-lg">
-                     <h3 className="font-semibold text-indigo-800">
-                        Durée moyenne session
-                     </h3>
-                     <p className="text-2xl font-bold text-indigo-600">
-                        {data.totals?.averageSessionDuration
-                           ? formatDuration(data.totals.averageSessionDuration)
-                           : "0m 0s"}
-                     </p>
-                  </div>
-
-                  <div className="bg-red-50 p-4 rounded-lg">
-                     <h3 className="font-semibold text-red-800">
-                        Taux de rebond
-                     </h3>
-                     <p className="text-2xl font-bold text-red-600">
-                        {data.totals?.averageBounceRate
-                           ? formatPercentage(data.totals.averageBounceRate)
-                           : "0%"}
-                     </p>
-                  </div>
-
-                  <div className="bg-teal-50 p-4 rounded-lg">
-                     <h3 className="font-semibold text-teal-800">
-                        Sessions/utilisateur
-                     </h3>
-                     <p className="text-2xl font-bold text-teal-600">
-                        {data.totals?.averageSessionsPerUser?.toFixed(2) || "0"}
-                     </p>
-                  </div>
+                  {getMetricsCards(data.totals).map((metric, index) => (
+                     <Card key={index}>
+                        <CardHeader>
+                           <CardTitle>{metric.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                           <div className="space-y-2">
+                              <p className="text-3xl font-bold">
+                                 {metric.value}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                 {metric.description}
+                              </p>
+                           </div>
+                        </CardContent>
+                     </Card>
+                  ))}
                </div>
 
                {/* Données quotidiennes */}
                {data.dailyData && data.dailyData.length > 0 && (
-                  <div className=" p-4 rounded-lg">
-                     <h3 className="font-semibold mb-4">
-                        Données quotidiennes
-                     </h3>
-                     <div className="overflow-x-auto">
-                        <table className="min-w-full  border border-gray-200">
-                           <thead>
-                              <tr className="">
-                                 <th className="px-4 py-2 border">Date</th>
-                                 <th className="px-4 py-2 border">Visiteurs</th>
-                                 <th className="px-4 py-2 border">Sessions</th>
-                                 <th className="px-4 py-2 border">
-                                    Pages vues
-                                 </th>
-                                 <th className="px-4 py-2 border">
-                                    Durée moy.
-                                 </th>
-                                 <th className="px-4 py-2 border">Rebond</th>
-                              </tr>
-                           </thead>
-                           <tbody>
-                              {data.dailyData.slice(-10).map((row, index) => (
-                                 <tr key={index} className="">
-                                    <td className="px-4 py-2 border text-center">
-                                       {row.dimensionValues[0].value}
-                                    </td>
-                                    <td className="px-4 py-2 border text-center">
-                                       {parseInt(
-                                          row.metricValues[0].value
-                                       ).toLocaleString()}
-                                    </td>
-                                    <td className="px-4 py-2 border text-center">
-                                       {parseInt(
-                                          row.metricValues[1].value
-                                       ).toLocaleString()}
-                                    </td>
-                                    <td className="px-4 py-2 border text-center">
-                                       {parseInt(
-                                          row.metricValues[2].value
-                                       ).toLocaleString()}
-                                    </td>
-                                    <td className="px-4 py-2 border text-center">
-                                       {formatDuration(
-                                          parseFloat(row.metricValues[3].value)
-                                       )}
-                                    </td>
-                                    <td className="px-4 py-2 border text-center">
-                                       {formatPercentage(
-                                          parseFloat(row.metricValues[4].value)
-                                       )}
-                                    </td>
+                  <Card>
+                     <CardHeader>
+                        <CardTitle>Données quotidiennes</CardTitle>
+                     </CardHeader>
+                     <CardContent>
+                        <div className="overflow-x-auto">
+                           <table className="min-w-full border border-gray-200">
+                              <thead>
+                                 <tr className="bg-gray-50">
+                                    <th className="px-4 py-2 border">Date</th>
+                                    <th className="px-4 py-2 border">
+                                       Visiteurs
+                                    </th>
+                                    <th className="px-4 py-2 border">
+                                       Sessions
+                                    </th>
+                                    <th className="px-4 py-2 border">
+                                       Pages vues
+                                    </th>
+                                    <th className="px-4 py-2 border">
+                                       Durée moy.
+                                    </th>
+                                    <th className="px-4 py-2 border">Rebond</th>
                                  </tr>
-                              ))}
-                           </tbody>
-                        </table>
-                     </div>
-                  </div>
+                              </thead>
+                              <tbody>
+                                 {data.dailyData
+                                    .slice(-10)
+                                    .map((row, index) => (
+                                       <tr
+                                          key={index}
+                                          className="hover:bg-gray-50"
+                                       >
+                                          <td className="px-4 py-2 border text-center">
+                                             {row.dimensionValues[0].value}
+                                          </td>
+                                          <td className="px-4 py-2 border text-center">
+                                             {parseInt(
+                                                row.metricValues[0].value
+                                             ).toLocaleString()}
+                                          </td>
+                                          <td className="px-4 py-2 border text-center">
+                                             {parseInt(
+                                                row.metricValues[1].value
+                                             ).toLocaleString()}
+                                          </td>
+                                          <td className="px-4 py-2 border text-center">
+                                             {parseInt(
+                                                row.metricValues[2].value
+                                             ).toLocaleString()}
+                                          </td>
+                                          <td className="px-4 py-2 border text-center">
+                                             {formatDuration(
+                                                parseFloat(
+                                                   row.metricValues[3].value
+                                                )
+                                             )}
+                                          </td>
+                                          <td className="px-4 py-2 border text-center">
+                                             {formatPercentage(
+                                                parseFloat(
+                                                   row.metricValues[4].value
+                                                )
+                                             )}
+                                          </td>
+                                       </tr>
+                                    ))}
+                              </tbody>
+                           </table>
+                        </div>
+                     </CardContent>
+                  </Card>
                )}
 
                {/* Données brutes (optionnel) */}
-               <details className=" p-4 rounded-lg">
-                  <summary className="font-semibold cursor-pointer">
-                     Données brutes (debug)
-                  </summary>
-                  <pre className="text-xs overflow-auto  p-4 rounded border mt-2">
-                     {JSON.stringify(data, null, 2)}
-                  </pre>
-               </details>
+               <Card>
+                  <CardHeader>
+                     <CardTitle>Données brutes (debug)</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                     <details>
+                        <summary className="font-semibold cursor-pointer mb-2">
+                           Afficher les données JSON
+                        </summary>
+                        <pre className="text-xs overflow-auto bg-gray-100 p-4 rounded border">
+                           {JSON.stringify(data, null, 2)}
+                        </pre>
+                     </details>
+                  </CardContent>
+               </Card>
             </div>
          ) : (
-            <p>Aucune donnée disponible</p>
+            <Card>
+               <CardContent>
+                  <p>Aucune donnée disponible</p>
+               </CardContent>
+            </Card>
          )}
       </div>
    );
