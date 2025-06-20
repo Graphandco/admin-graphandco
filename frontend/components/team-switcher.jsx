@@ -1,81 +1,108 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ChevronsUpDown, Plus } from "lucide-react"
+import * as React from "react";
+import { ChevronsUpDown, Globe } from "lucide-react";
+import { useSite } from "@/contexts/SiteContext";
+import { useRouter, usePathname } from "next/navigation";
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+   DropdownMenu,
+   DropdownMenuContent,
+   DropdownMenuItem,
+   DropdownMenuLabel,
+   DropdownMenuSeparator,
+   DropdownMenuShortcut,
+   DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar"
+   SidebarMenu,
+   SidebarMenuButton,
+   SidebarMenuItem,
+   useSidebar,
+} from "@/components/ui/sidebar";
 
-export function TeamSwitcher({
-  teams
-}) {
-  const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+export function TeamSwitcher() {
+   const { isMobile } = useSidebar();
+   const { sites, selectedSite, switchSite, loading } = useSite();
+   const router = useRouter();
+   const pathname = usePathname();
 
-  if (!activeTeam) {
-    return null
-  }
+   const handleSiteChange = (siteId) => {
+      const numericSiteId = parseInt(siteId, 10);
+      const site = sites.find((s) => s.id === numericSiteId);
 
-  return (
-    (<SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+      if (site) {
+         switchSite(numericSiteId);
+
+         const pathParts = pathname.split("/").filter(Boolean);
+         if (pathParts.length === 2) {
+            const currentSection = pathParts[0];
+            router.push(`/${currentSection}/${site.slug}`);
+         } else {
+            router.push(`/stats/${site.slug}`);
+         }
+      }
+   };
+
+   if (loading) {
+      return (
+         <SidebarMenuItem>
             <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-              <div
-                className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <activeTeam.logo className="size-4" />
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{activeTeam.name}</span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
-              </div>
-              <ChevronsUpDown className="ml-auto" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            align="start"
-            side={isMobile ? "bottom" : "right"}
-            sideOffset={4}>
-            <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Teams
-            </DropdownMenuLabel>
-            {teams.map((team, index) => (
-              <DropdownMenuItem key={team.name} onClick={() => setActiveTeam(team)} className="gap-2 p-2">
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  <team.logo className="size-3.5 shrink-0" />
-                </div>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div
-                className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <Plus className="size-4" />
-              </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>)
-  );
+               size="lg"
+               className="animate-pulse bg-gray-200 dark:bg-gray-800"
+            />
+         </SidebarMenuItem>
+      );
+   }
+
+   if (!selectedSite) {
+      return null;
+   }
+
+   return (
+      <SidebarMenu>
+         <SidebarMenuItem>
+            <DropdownMenu>
+               <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton
+                     size="lg"
+                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  >
+                     <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                        <Globe className="size-4" />
+                     </div>
+                     <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-medium">
+                           {selectedSite.name}
+                        </span>
+                     </div>
+                     <ChevronsUpDown className="ml-auto" />
+                  </SidebarMenuButton>
+               </DropdownMenuTrigger>
+               <DropdownMenuContent
+                  className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                  align="start"
+                  side={isMobile ? "bottom" : "right"}
+                  sideOffset={4}
+               >
+                  <DropdownMenuLabel className="text-muted-foreground text-xs">
+                     Sites
+                  </DropdownMenuLabel>
+                  {sites.map((site) => (
+                     <DropdownMenuItem
+                        key={site.id}
+                        onClick={() => handleSiteChange(site.id)}
+                        className="gap-2 p-2"
+                     >
+                        <div className="flex size-6 items-center justify-center rounded-md border">
+                           <Globe className="size-3.5 shrink-0" />
+                        </div>
+                        {site.name}
+                     </DropdownMenuItem>
+                  ))}
+               </DropdownMenuContent>
+            </DropdownMenu>
+         </SidebarMenuItem>
+      </SidebarMenu>
+   );
 }

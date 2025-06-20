@@ -5,6 +5,7 @@ import SiteSelector from "@/components/SiteSelector";
 
 export default function Header() {
    const { user, logout } = useAuth();
+   console.log(user);
 
    return (
       <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
@@ -20,7 +21,7 @@ export default function Header() {
                   <>
                      <li>
                         <span className="text-gray-400">
-                           Bonjour, {user.username}
+                           Bonjour, {user?.user?.username}
                         </span>
                      </li>
                      <li>
