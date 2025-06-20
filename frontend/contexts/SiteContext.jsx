@@ -21,6 +21,7 @@ export function SiteProvider({ children }) {
                   allSites.find((s) => s.id.toString() === storedSiteId) ||
                   allSites[0];
                setSelectedSite(site);
+               console.log(site);
             }
          } catch (error) {
             console.error("Erreur lors de la récupération des sites:", error);

@@ -19,7 +19,7 @@ export default async function SiteInfosPage({ params }) {
 
    return (
       <div className="p-8">
-         <h1 className="text-2xl font-bold">Informations pour : {site.name}</h1>
+         <h1 className="text-2xl font-bold">Paiements pour : {site.name}</h1>
          {/* D'autres informations sur le site pourront être ajoutées ici */}
       </div>
    );
