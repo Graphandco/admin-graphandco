@@ -8,6 +8,21 @@ import {
    SelectTrigger,
    SelectValue,
 } from "@/components/ui/select";
+import {
+   ChartContainer,
+   ChartTooltip,
+   ChartTooltipContent,
+   ChartLegend,
+   ChartLegendContent,
+} from "@/components/ui/chart";
+import {
+   Area,
+   AreaChart,
+   XAxis,
+   YAxis,
+   CartesianGrid,
+   ResponsiveContainer,
+} from "recharts";
 
 // Configuration des sites
 const SITES = [
@@ -92,6 +107,35 @@ export default function StatsPage() {
 
    const formatPercentage = (value) => {
       return `${(value * 100).toFixed(1)}%`;
+   };
+
+   // Préparer les données pour le graphique
+   const prepareChartData = (dailyData) => {
+      if (!dailyData || dailyData.length === 0) return [];
+
+      const mappedData = dailyData.map((row) => {
+         // Convertir le format YYYYMMDD en objet Date
+         const dateStr = row.dimensionValues[0].value;
+         const year = dateStr.substring(0, 4);
+         const month = dateStr.substring(4, 6);
+         const day = dateStr.substring(6, 8);
+         const date = new Date(year, month - 1, day); // month - 1 car les mois commencent à 0
+
+         return {
+            date: dateStr, // Garder la date originale pour l'affichage
+            dateObj: date, // Objet Date pour le tri
+            visiteurs: parseInt(row.metricValues[0].value) || 0,
+            sessions: parseInt(row.metricValues[1].value) || 0,
+            pagesVues: parseInt(row.metricValues[2].value) || 0,
+            dureeMoyenne: parseFloat(row.metricValues[3].value) || 0,
+            tauxRebond: parseFloat(row.metricValues[4].value) || 0,
+         };
+      });
+
+      // S'assurer que les données sont triées par date pour que les lignes du graphique s'affichent
+      return mappedData.sort(
+         (a, b) => a.dateObj.getTime() - b.dateObj.getTime()
+      );
    };
 
    // Configuration des métriques pour les cartes
@@ -253,6 +297,8 @@ export default function StatsPage() {
       );
    }
 
+   const chartData = prepareChartData(data?.dailyData);
+
    return (
       <div className="p-8">
          <h1 className="text-2xl font-bold mb-6">
@@ -311,6 +357,109 @@ export default function StatsPage() {
                      </p>
                   </CardContent>
                </Card>
+
+               {/* Graphique d'évolution */}
+               {chartData.length > 0 && (
+                  <Card>
+                     <CardHeader>
+                        <CardTitle>Évolution des métriques</CardTitle>
+                     </CardHeader>
+                     <CardContent>
+                        <ChartContainer
+                           config={{
+                              visiteurs: {
+                                 label: "Visiteurs uniques",
+                                 color: "#3b82f6", // Bleu
+                              },
+                              sessions: {
+                                 label: "Sessions",
+                                 color: "#16a34a", // Vert
+                              },
+                              pagesVues: {
+                                 label: "Pages vues",
+                                 color: "#f97316", // Orange
+                              },
+                           }}
+                           className="h-[300px] w-full"
+                        >
+                           <AreaChart data={chartData}>
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis
+                                 dataKey="date"
+                                 tickFormatter={(value) => {
+                                    // Convertir le format YYYYMMDD en objet Date
+                                    const year = value.substring(0, 4);
+                                    const month = value.substring(4, 6);
+                                    const day = value.substring(6, 8);
+                                    const date = new Date(year, month - 1, day);
+
+                                    return date.toLocaleDateString("fr-FR", {
+                                       day: "2-digit",
+                                       month: "2-digit",
+                                    });
+                                 }}
+                              />
+                              <YAxis />
+                              <ChartTooltip
+                                 content={({ active, payload, label }) => {
+                                    if (active && payload && payload.length) {
+                                       // Convertir le format YYYYMMDD en objet Date pour l'affichage
+                                       const year = label.substring(0, 4);
+                                       const month = label.substring(4, 6);
+                                       const day = label.substring(6, 8);
+                                       const date = new Date(
+                                          year,
+                                          month - 1,
+                                          day
+                                       );
+                                       const formattedDate =
+                                          date.toLocaleDateString("fr-FR", {
+                                             day: "2-digit",
+                                             month: "2-digit",
+                                             year: "numeric",
+                                          });
+
+                                       return (
+                                          <ChartTooltipContent
+                                             active={active}
+                                             payload={payload}
+                                             label={formattedDate}
+                                          />
+                                       );
+                                    }
+                                    return null;
+                                 }}
+                              />
+                              <ChartLegend content={<ChartLegendContent />} />
+                              <Area
+                                 type="monotone"
+                                 dataKey="pagesVues"
+                                 stroke="#f97316"
+                                 fillOpacity={0.3}
+                                 fill="#f97316"
+                                 connectNulls
+                              />
+                              <Area
+                                 type="monotone"
+                                 dataKey="sessions"
+                                 stroke="#16a34a"
+                                 fillOpacity={0.3}
+                                 fill="#16a34a"
+                                 connectNulls
+                              />
+                              <Area
+                                 type="monotone"
+                                 dataKey="visiteurs"
+                                 stroke="#3b82f6"
+                                 fillOpacity={0.3}
+                                 fill="#3b82f6"
+                                 connectNulls
+                              />
+                           </AreaChart>
+                        </ChartContainer>
+                     </CardContent>
+                  </Card>
+               )}
 
                {/* Totaux avec Cards */}
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -419,7 +568,7 @@ export default function StatsPage() {
                         <summary className="font-semibold cursor-pointer mb-2">
                            Afficher les données JSON
                         </summary>
-                        <pre className="text-xs overflow-auto bg-gray-100 p-4 rounded border">
+                        <pre className="text-xs overflow-auto p-4 rounded border">
                            {JSON.stringify(data, null, 2)}
                         </pre>
                      </details>
