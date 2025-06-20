@@ -15,34 +15,14 @@ const formatDate = (dateString) => {
 };
 
 export default function SelectInfos({
-   SITES,
    PERIODS,
-   selectedSite,
    selectedPeriod,
-   handleSiteChange,
    handlePeriodChange,
    data,
 }) {
    return (
       <div className="space-y-6">
-         {/* Sélecteurs */}
-         <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-               <label className="text-sm font-medium">Site</label>
-               <Select value={selectedSite.id} onValueChange={handleSiteChange}>
-                  <SelectTrigger>
-                     <SelectValue placeholder="Sélectionner un site" />
-                  </SelectTrigger>
-                  <SelectContent>
-                     {SITES.map((site) => (
-                        <SelectItem key={site.id} value={site.id}>
-                           {site.name} ({site.id})
-                        </SelectItem>
-                     ))}
-                  </SelectContent>
-               </Select>
-            </div>
-
+         <div className="mb-6 max-w-xs">
             <div className="space-y-2">
                <label className="text-sm font-medium">Période</label>
                <Select
@@ -63,7 +43,6 @@ export default function SelectInfos({
             </div>
          </div>
 
-         {/* Période */}
          <Card>
             <CardHeader>
                <CardTitle>Période analysée</CardTitle>
