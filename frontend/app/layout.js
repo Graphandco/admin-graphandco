@@ -64,7 +64,10 @@ function LayoutContent({ children }) {
                   </Breadcrumb>
                </div>
             </header>
-            <div className="flex flex-1 flex-col gap-4 p-8 sm:p-16">
+            <div className="flex flex-1 flex-col gap-4 px-8 sm:px-16 pt-4 sm:pt-8 pb-8 sm:pb-16">
+               <div className="text-3xl font-bold text-primary text-center">
+                  <h1>{selectedSite?.name || "Chargement..."}</h1>
+               </div>
                {children}
             </div>
          </SidebarInset>

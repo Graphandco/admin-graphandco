@@ -8,7 +8,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Edit, MapPin, Save, User, X, Link } from "lucide-react";
+import {
+   Edit,
+   MapPin,
+   Save,
+   User,
+   X,
+   Link,
+   Pencil,
+   FilePen,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export default function CoordonneesPage({ params }) {
@@ -112,15 +121,24 @@ export default function CoordonneesPage({ params }) {
                </p>
             </div>
             <div className="flex items-center space-x-2">
-               <Label htmlFor="edit-mode" className="text-sm font-medium">
+               {/* <Label htmlFor="edit-mode" className="text-sm font-medium">
                   Mode édition
-               </Label>
-               <Switch
+               </Label> */}
+               <FilePen
+                  size={25}
+                  className={`cursor-pointer scale-100 hover:scale-110 transition-all duration-300 ${
+                     editMode
+                        ? "text-green-500"
+                        : "text-gray-500 hover:text-white"
+                  }`}
+                  onClick={toggleEditMode}
+               />
+               {/* <Switch
                   id="edit-mode"
                   checked={editMode}
                   onCheckedChange={toggleEditMode}
                   disabled={!user || !token}
-               />
+               /> */}
             </div>
          </div>
 
