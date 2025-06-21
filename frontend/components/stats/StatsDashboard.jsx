@@ -78,7 +78,7 @@ export default function StatsDashboard({ site }) {
 
    if (loading) {
       return (
-         <div className="p-8">
+         <div className="">
             <h1 className="text-2xl font-bold mb-4">
                Statistiques pour {site.name}
             </h1>
@@ -92,7 +92,7 @@ export default function StatsDashboard({ site }) {
 
    if (error) {
       return (
-         <div className="p-8">
+         <div className="">
             <h1 className="text-2xl font-bold mb-4">
                Statistiques pour {site.name}
             </h1>
@@ -107,7 +107,7 @@ export default function StatsDashboard({ site }) {
    const chartData = prepareChartData(data?.dailyData);
 
    return (
-      <div className="p-8">
+      <div className="">
          <h1 className="text-2xl font-bold mb-6">
             Statistiques pour {site.name}
          </h1>

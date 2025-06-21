@@ -22,14 +22,36 @@
       "type": "string"
     },
     "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ],
-      "type": "media",
-      "multiple": false
+      ]
+    },
+    "url": {
+      "type": "string"
+    },
+    "admin_url": {
+      "type": "string"
+    },
+    "person": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "ville": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
     }
   }
 }
